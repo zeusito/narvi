@@ -1,0 +1,59 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend-api/**"
+  workflow_dispatch: {}
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linter:
+    name: Lint Go
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend-api
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+          cache: false
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.11
+          args: --config=.golangci.yaml
+          working-directory: backend-api
+
+  tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: [linter]
+    defaults:
+      run:
+        working-directory: backend-api
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+
+      - name: Build
+        run: CGO_ENABLED=0 go build -o ./out/app ./cmd/main.go
+
+      - name: Unit Test
+        run: go test -v ./... --race

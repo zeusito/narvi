@@ -1,0 +1,12 @@
+[server]
+port = "3000"
+
+[database]
+enabled = false
+host = "localhost"
+port = 5432
+db-name = "mydb?sslmode=disable"
+user = "postgres"
+password = "qwerty"
+pool-size = 1
+log-queries = false
