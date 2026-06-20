@@ -1,4 +1,4 @@
-package sessions
+package otp
 
 import (
 	"github.com/uptrace/bun"
@@ -10,7 +10,10 @@ type Module struct {
 }
 
 func NewModule(db *bun.DB, hasher hasher.Hasher) *Module {
-	repo := NewDefaultRepository(db)
-	manager := NewDefaultManager(repo, hasher)
-	return &Module{Manager: manager}
+	repo := newDefaultRepository(db)
+	svc := NewDefaultManager(repo, hasher)
+
+	return &Module{
+		Manager: svc,
+	}
 }
